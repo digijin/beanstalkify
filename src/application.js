@@ -28,8 +28,10 @@ class Application {
     /**
      * @param {object} args - Arguments
      * @param {string} args.archiveFilePath - The path of archive to deploy (e.g. AppName-version.zip)
-     * @param {string} args.environmentName - Environment to provision (e.g. my-awesome-app)
+     * @param {string} args.environmentName - Environment to provision (e.g. my-awesome-app-prod)
      * @param {string} args.awsStackName - Stack to provision (e.g. '64bit Amazon Linux 2015.03 v2.0.0 running Node.js')
+     * @param {string} [args.version] - Version number of artifact (e.g. 'v12345')
+     * @param {string} [args.applicationName] - Name of the application (e.g. MyAwesomeApp)
      * @param {object} args.beanstalkConfig - Configuration overrides for the environment (optional)
      * @returns {promise} Promise
      */
@@ -39,11 +41,14 @@ class Application {
         const environmentName = args.environmentName;
         const stack = args.awsStackName;
         const config = args.beanstalkConfig;
+        // new optional
+        const version = args.version;
+        const appName = args.applicationName;
 
         return q.async(function* () {
 
             // Upload artifact
-            const {versionLabel, applicationName} = yield this.archive.upload(archivePath);
+            const {versionLabel, applicationName} = yield this.archive.upload(archivePath, appName, version);
 
             // Get environment status
             const env = yield this.environment.status(environmentName);

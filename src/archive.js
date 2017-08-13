@@ -84,13 +84,30 @@ class Archive {
     /**
      * Upload artifact to application and make application version available
      * @param {string} filePath - File path of the artifact
+     * @param {string} [appName] - Name of application
+     * @param {string} [version] - Version number
      * @returns {Promise.<T>} Promise
      */
-    upload(filePath) {
+    upload(filePath, appName, version) {
 
         return q.async(function* () {
             // Step 1
             const {archiveName, versionLabel, applicationName} = this.parse(filePath);
+
+            // if version and appname were passed in, use them
+            if (appName) {
+                applicationName = appName;
+            }
+            if (version) {
+                versionLabel = version;
+            }
+
+            if (!applicationName) {
+                throw new Error('could not determine app name, checked params and filename');
+            }
+            if (!versionLabel) {
+                throw new Error('could not determine version,  checked params and filename');
+            }
 
             // Step 2
             const ifAlreadyUploaded = yield this.alreadyUploaded(applicationName, versionLabel);
